@@ -1,0 +1,4 @@
+read_delay: 1.25
+write_delay: 0.0005
+move_delay: 0.4
+move_one_pos_delay: 0.001
