@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 
-class BadConfigException: std::exception
+class BadConfigException: public std::exception
 {
 public:
   BadConfigException(std::string error) :
@@ -18,6 +18,21 @@ public:
 
 private:
   std::string what_message_;
+};
+
+class FieldNotFoundException: public BadConfigException
+{
+  using BadConfigException::BadConfigException;
+};
+
+class BadFieldException: public BadConfigException
+{
+  using BadConfigException::BadConfigException;
+};
+
+class FileNotFoundException: public BadConfigException
+{
+  using BadConfigException::BadConfigException;
 };
 
 #endif

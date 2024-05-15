@@ -3,7 +3,7 @@
 
 int main(int argc, char const **argv)
 {
-    ::testing::InitGoogleTest(&argc, argv);
+    ::testing::InitGoogleTest();
     return RUN_ALL_TESTS();
 }
 
