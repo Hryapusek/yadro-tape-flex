@@ -8,22 +8,22 @@
 class ITapeDevice {
 public:
     /**
-     * @throw - ReadFailedException
+     * @throw ReadFailedException if reading fails
      */
     virtual unsigned read() const = 0;
 
     /**
-     * @throw - WriteFailedException
+     * @throw WriteFailedException if writing fails
      */
     virtual void write(unsigned value) = 0;
 
     /**
-     * @throw - BeginReachedException
+     * @throw BeginReachedException if moving back reaches the beginning
      */
     virtual void moveBack() = 0;
 
     /**
-     * @throw - EndReachedException
+     * @throw EndReachedException if moving forward reaches the end
      */
     virtual void moveForward() = 0;
     virtual bool canMoveForward() const = 0;
@@ -38,7 +38,7 @@ public:
     virtual std::vector<unsigned> toVector() = 0;
 
     /**
-     * @throw - WriteFailedException
+     * @throw WriteFailedException if writing the vector fails
      */
     virtual void write(std::vector<unsigned> arr) = 0;
     virtual ~ITapeDevice() = default;
