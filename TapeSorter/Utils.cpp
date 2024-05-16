@@ -24,47 +24,47 @@ bool TapeSorterUtils::isTapeEmpty(ITapeDevice * inputTape)
 }
 
 long partition(ITapeDevice *tape, long low, long high) {
-	unsigned pivot;
-	long i = low - 1;
-	tape->moveToBegin();
-	tape->moveToIndex(low);
-	unsigned pivotIndex = low + (high - low) / 2;
-	for (long j = low; j <= high; ++j) {
-		if (j != pivotIndex) {
-			tape->moveForward();
-			unsigned temp = tape->read();
-			if (temp < pivot) {
-				++i;
-				tape->swap(i, j);
-				tape->moveBack();
-				tape->write(temp);
-			}
-		}
-	}
-	tape->moveToBegin();
-	tape->moveToIndex(i + 1);
-	for (long k = low; k <= i; ++k) {
-		tape->moveForward();
-	}
-	tape->swap(i + 1, high);
-	return i + 1;
+    long i = low - 1;
+    unsigned pivotIndex = low + (high - low) / 2;
+    tape->moveToIndex(pivotIndex);
+    unsigned pivot = tape->read();  // Read the pivot value at the pivotIndex
+    tape->swap(pivotIndex, high);  // Move pivot to end for easier loop handling
+    for (long j = low; j < high; ++j) {
+        tape->moveToIndex(j);
+        unsigned temp = tape->read();
+        if (temp < pivot) {
+            ++i;
+            tape->moveToIndex(i);
+            tape->swap(i, j);
+        }
+    }
+    tape->moveToIndex(i + 1);
+    tape->swap(i + 1, high);  // Move pivot to its final place
+    return i + 1;
 }
 
 void quicksort(ITapeDevice *tape, long start, long end) {
-	if (start < end) {
-		long pivot = partition(tape, start, end);
-		quicksort(tape, start, pivot - 1);
-		quicksort(tape, pivot + 1, end);
-	}
+    if (start < end) {
+        long pivot = partition(tape, start, end);
+        quicksort(tape, start, pivot - 1);
+        quicksort(tape, pivot + 1, end);
+    }
 }
 
 void TapeSorterUtils::sortTape(ITapeDevice *tape) {
-	tape->moveToBegin();
-	long tapeLength = 0;
-	while (tape->canMoveForward()) {
-		tape->moveForward();
-		++tapeLength;
-	}
-	quicksort(tape, 0, tape->size()-1);
-}
+    if (tape->empty()) return;  // Early exit if tape is empty
 
+    tape->moveToBegin();
+    long lastValuedIndex = -1;
+    for (long i = 0; i < tape->size(); ++i) {
+        if (tape->hasValue()) {
+            lastValuedIndex = i;
+            if (i < tape->size() - 1)
+                tape->moveForward();
+        }
+        else break;
+    }
+    if (lastValuedIndex != -1) {
+        quicksort(tape, 0, lastValuedIndex);
+    }
+}
