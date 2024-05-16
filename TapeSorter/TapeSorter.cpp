@@ -20,7 +20,7 @@ namespace
         const unsigned long maxArrayLength = TapeSorterUtils::calculateMaxArrayLength(characts);
         if (maxArrayLength >= inputTape->size())
             return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortEnoughMemoryStrategy>());
-        else if (std::ceil(inputTape->size() / static_cast<double>(maxArrayLength)) <= characts.reasonable_number_of_temp_tapes)
+        else if (maxArrayLength > 1 and std::ceil(inputTape->size() / static_cast<double>(maxArrayLength)) <= characts.reasonable_number_of_temp_tapes)
             return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortNotEnoughMemoryStrategy>());
         else
             return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortWithoutMemoryStrategy>());
