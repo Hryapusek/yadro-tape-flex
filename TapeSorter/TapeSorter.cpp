@@ -3,39 +3,33 @@
 #include <vector>
 #include <fmt/format.h>
 #include <filesystem>
-#include "TapeDevice/FileTapeDevice/FileTapeDevice.hpp"
+#include <iostream>
+#include <algorithm>
 
+#include "TapeDevice/FileTapeDevice/FileTapeDevice.hpp"
+#include "Utils.hpp"
+#include "Strategies/ISortStrategy.hpp"
+#include "Strategies/SortEnoughMemoryStrategy.hpp"
+#include "Strategies/SortNotEnoughMemoryStrategy.hpp"
+#include "Strategies/SortWithoutMemoryStrategy.hpp"
 
 namespace
 {
-    std::shared_ptr<ITapeDevice> createTempTape(unsigned long tapeSize, const InputCharacteristics &characts)
+    std::shared_ptr<ISortStrategy> chooseStrategy(ITapeDevice *inputTape, const InputCharacteristics &characts)
     {
-        static long long counter = 0;
-        static const std::string tempFileTemplate = "tape_{}.txt";
-        namespace fs = std::filesystem;
-        fs::path tempDirectory = fs::current_path() / "tmp";
-        if (not fs::is_directory(tempDirectory))
-            fs::create_directory(tempDirectory);
-        auto tempFilePath = tempDirectory / fmt::format(tempFileTemplate, counter++);
-        while (fs::is_regular_file(tempFilePath))
-            tempFilePath = tempDirectory / fmt::format(tempFileTemplate, counter++);
-        
-        TapeDeviceCharacteristics tempTapeCharacteristics{
-            .tape_file = tempFilePath,
-            .read_delay = characts.read_delay,
-            .write_delay = characts.write_delay,
-            .move_delay = characts.move_delay,
-            .move_one_pos_delay = characts.move_one_pos_delay,
-        };
-        
-        return std::static_pointer_cast<ITapeDevice>(std::make_shared<FileTapeDevice>(std::move(tempTapeCharacteristics)));
+        const unsigned long maxArrayLength = TapeSorterUtils::calculateMaxArrayLength(characts);
+        if (maxArrayLength >= inputTape->size())
+            return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortEnoughMemoryStrategy>());
+        else if (std::ceil(inputTape->size() / static_cast<double>(maxArrayLength)) <= characts.reasonable_number_of_temp_tapes)
+            return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortNotEnoughMemoryStrategy>());
+        else
+            return std::static_pointer_cast<ISortStrategy>(std::make_shared<SortWithoutMemoryStrategy>());
     }
 }
 
 void TapeSorter::sort(ITapeDevice *inputTape, ITapeDevice *outputTape, const InputCharacteristics &characts)
 {
-    assert(inputTape); assert(outputTape);
-    std::vector<std::shared_ptr<ITapeDevice>> tempTapes;
-    const unsigned long maxArrayLength = characts.memory_bytes / 4;
-    tempTapes.push_back(createTempTape(maxArrayLength, characts));
+	assert(inputTape); assert(outputTape);
+    auto sortStrategy = chooseStrategy(inputTape, characts);
+    sortStrategy->sort(inputTape, outputTape, characts);
 }
