@@ -35,7 +35,6 @@ public:
     virtual void swap(unsigned long lhs, unsigned long rhs) = 0;
     virtual bool hasValue() = 0;
     virtual unsigned long size() const = 0;
-    virtual void fixSize() = 0;
     virtual std::vector<unsigned> toVector() = 0;
 
     /**
