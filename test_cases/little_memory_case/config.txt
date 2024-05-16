@@ -1,0 +1,8 @@
+read_delay_milliseconds: 10
+write_delay_milliseconds: 10
+move_delay_milliseconds: 10
+move_one_pos_delay_milliseconds: 10
+memory_bytes: 10
+input_file: test_cases/little_memory_case/input_tape.txt
+output_file: test_cases/little_memory_case/output_tape.txt
+reasonable_number_of_temp_tapes: 100000
