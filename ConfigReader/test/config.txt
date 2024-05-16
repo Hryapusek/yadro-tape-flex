@@ -3,3 +3,6 @@ write_delay: 0.0005
 move_delay: 0.4
 move_one_pos_delay: 0.001
 memory_bytes: 10
+input_file: input_tape.txt
+output_file: output_tape.txt
+reasonable_number_of_temp_tapes: 100000

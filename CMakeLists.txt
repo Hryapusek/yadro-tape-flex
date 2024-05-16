@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11)
 project(TAPE_FLEX)
 
-set(option_test "Enable testing?" ON)
+option(option_test "Enable testing?" ON)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -17,6 +17,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(fmt)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(target tape_sorter)
 set(test_target tape_sorter_test)
 add_executable(${target})
@@ -28,7 +31,17 @@ set(sources
     TapeDevice/Interface/ITapeDevice.hpp
     TapeSorter/TapeSorter.cpp
     TapeSorter/TapeSorter.hpp
+    TapeSorter/Strategies/ISortStrategy.hpp
+    TapeSorter/Strategies/SortEnoughMemoryStrategy.cpp
+    TapeSorter/Strategies/SortEnoughMemoryStrategy.hpp
+    TapeSorter/Strategies/SortNotEnoughMemoryStrategy.cpp
+    TapeSorter/Strategies/SortNotEnoughMemoryStrategy.hpp
+    TapeSorter/Strategies/SortWithoutMemoryStrategy.cpp
+    TapeSorter/Strategies/SortWithoutMemoryStrategy.hpp
+    TapeSorter/Utils.cpp
+    TapeSorter/Utils.hpp
     TapeDevice/FileTapeDevice/FileTapeDevice.cpp
+    TapeDevice/Interface/Exceptions.hpp
 )
 set(libs fmt)
 target_sources(${target} PUBLIC ${sources} main.cpp)

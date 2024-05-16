@@ -10,4 +10,8 @@ TEST(config, default_config_read)
 	EXPECT_EQ(inputCharacteristics.move_delay, 0.4);
 	EXPECT_EQ(inputCharacteristics.move_one_pos_delay, 0.001);
 	EXPECT_EQ(inputCharacteristics.memory_bytes, 10ul);
+	EXPECT_EQ(inputCharacteristics.reasonable_number_of_temp_tapes, 100000ul);
+	EXPECT_EQ(inputCharacteristics.input_file, "input_tape.txt");
+	EXPECT_EQ(inputCharacteristics.output_file, "output_tape.txt");
+	
 }

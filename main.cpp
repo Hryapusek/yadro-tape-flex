@@ -8,12 +8,13 @@
 
 int main(int argc, char const *argv[])
 {
-    std::filesystem::path configFile("config.txt");
+    namespace fs = std::filesystem;
+    fs::path configFile("config.txt");
     auto characteristics = ConfigReader::readFromFile(configFile);
     std::cout << "Read from config:\n" << characteristics;
 
-    std::filesystem::path inputTapeFile("input_tape.txt");
-    std::filesystem::path outputTapeFile("output_tape.txt");
+    fs::path inputTapeFile(fs::current_path() / characteristics.input_file);
+    fs::path outputTapeFile(fs::current_path() / characteristics.output_file);
     
     TapeDeviceCharacteristics inputTapeCharacteristics{
         .tape_file = inputTapeFile,
@@ -31,8 +32,8 @@ int main(int argc, char const *argv[])
         .move_one_pos_delay = characteristics.move_one_pos_delay,
     };
 
-    auto inputTape = std::make_unique<FileTapeDevice>(inputTapeCharacteristics, true);
-    auto outputTape = std::make_unique<FileTapeDevice>(outputTapeCharacteristics);
+    auto inputTape = std::make_unique<FileTapeDevice>(inputTapeCharacteristics);
+    auto outputTape = std::make_unique<FileTapeDevice>(outputTapeCharacteristics, inputTape->size());
 
     TapeSorter::sort(inputTape.get(), outputTape.get(), characteristics);
     return 0;
