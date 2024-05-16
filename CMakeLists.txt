@@ -51,7 +51,7 @@ else()
 endif()
 
 target_sources(${target} PUBLIC ${sources} src/main.cpp)
-target_include_directories(${target} PUBLIC ${CMAKE_SOURCE_DIR})
+target_include_directories(${target} PUBLIC ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(${target} PUBLIC ${libs})
 
 if(option_test)
@@ -61,7 +61,7 @@ if(option_test)
     src/ConfigReader/TestConfigReader.cpp
     )
     target_sources(${test_target} PUBLIC ${sources} ${test_sources} src/main_test.cpp)
-    target_include_directories(${test_target} PUBLIC ${CMAKE_SOURCE_DIR})
+    target_include_directories(${test_target} PUBLIC ${CMAKE_SOURCE_DIR}/src)
     target_link_libraries(${test_target} PUBLIC ${libs} gtest gtest_main)
     file(COPY ${CMAKE_SOURCE_DIR}/src/ConfigReader/test DESTINATION ${CMAKE_BINARY_DIR}/)
     file(COPY ${CMAKE_SOURCE_DIR}/test_cases DESTINATION ${CMAKE_BINARY_DIR}/)
