@@ -27,8 +27,8 @@ long partition(ITapeDevice *tape, long low, long high) {
     long i = low - 1;
     unsigned pivotIndex = low + (high - low) / 2;
     tape->moveToIndex(pivotIndex);
-    unsigned pivot = tape->read();  // Read the pivot value at the pivotIndex
-    tape->swap(pivotIndex, high);  // Move pivot to end for easier loop handling
+    unsigned pivot = tape->read();
+    tape->swap(pivotIndex, high);
     for (long j = low; j < high; ++j) {
         tape->moveToIndex(j);
         unsigned temp = tape->read();
@@ -39,7 +39,7 @@ long partition(ITapeDevice *tape, long low, long high) {
         }
     }
     tape->moveToIndex(i + 1);
-    tape->swap(i + 1, high);  // Move pivot to its final place
+    tape->swap(i + 1, high);
     return i + 1;
 }
 
@@ -52,7 +52,7 @@ void quicksort(ITapeDevice *tape, long start, long end) {
 }
 
 void TapeSorterUtils::sortTape(ITapeDevice *tape) {
-    if (tape->empty()) return;  // Early exit if tape is empty
+    if (tape->empty()) return;
 
     tape->moveToBegin();
     long lastValuedIndex = -1;
