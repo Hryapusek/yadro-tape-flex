@@ -44,6 +44,12 @@ set(sources
     TapeDevice/Interface/Exceptions.hpp
 )
 set(libs fmt)
+if(MSVC)
+    target_compile_options(${target} PRIVATE /W4 /WX)
+else()
+    target_compile_options(${target} PRIVATE -Wall -Wextra -pedantic)
+endif()
+
 target_sources(${target} PUBLIC ${sources} main.cpp)
 target_include_directories(${target} PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(${target} PUBLIC ${libs})
@@ -54,7 +60,6 @@ if(option_test)
     set(test_sources
         ConfigReader/TestConfigReader.cpp
     )
-    target_compile_definitions(${test_target} PUBLIC google_test)
     target_sources(${test_target} PUBLIC ${sources} ${test_sources} main_test.cpp)
     target_include_directories(${test_target} PUBLIC ${CMAKE_SOURCE_DIR})
     target_link_libraries(${test_target} PUBLIC ${libs} gtest gtest_main)
