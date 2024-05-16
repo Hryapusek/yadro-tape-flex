@@ -1,7 +1,7 @@
-read_delay: 1.25
-write_delay: 0.0005
-move_delay: 0.4
-move_one_pos_delay: 0.001
+read_delay_milliseconds: 100
+write_delay_milliseconds: 100
+move_delay_milliseconds: 100
+move_one_pos_delay_milliseconds: 100
 memory_bytes: 10
 input_file: input_tape.txt
 output_file: output_tape.txt
