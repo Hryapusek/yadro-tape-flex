@@ -1,18 +1,18 @@
 #include "FileTapeDevice.hpp"
 #include <cassert>
 #include <algorithm>
+#include <thread>
+#include <iostream>
 
 FileTapeDevice::FileTapeDevice(TapeDeviceCharacteristics characteristics, unsigned long size) :
     characts_(std::move(characteristics)),
     tapeArray_(size, std::nullopt),
-    isFixedSize_(true),
     position_(0),
     outputFile_(characts_.tape_file)
 {}
 
 FileTapeDevice::FileTapeDevice(TapeDeviceCharacteristics characteristics) :
     characts_(std::move(characteristics)),
-    isFixedSize_(true),
     position_(0)
 {
     std::ifstream file(characts_.tape_file);
@@ -38,6 +38,8 @@ unsigned FileTapeDevice::read() const
     {
         throw ReadFailedException("Attempted to read an uninitialized position.");
     }
+    std::cout << "File: " << characts_.tape_file << ", Operation: read, Position: " << position_ << ", Delay: " << characts_.read_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.read_delay_milliseconds));
     return tapeArray_[position_].value();
 }
 
@@ -46,6 +48,8 @@ void FileTapeDevice::write(unsigned value)
     if (position_ >= tapeArray_.size()) {
         throw WriteFailedException("Attempted to write beyond the current tape size.");
     }
+    std::cout << "File: " << characts_.tape_file << ", Operation: write, Position: " << position_ << ", Delay: " << characts_.write_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.write_delay_milliseconds));
     tapeArray_[position_] = value;
 }
 
@@ -57,6 +61,8 @@ void FileTapeDevice::moveBack()
     {
         throw BeginReachedException("Beginning of tape reached.");
     }
+    std::cout << "File: " << characts_.tape_file << ", Operation: moveBack, Position: " << position_ << ", Delay: " << characts_.move_one_pos_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.move_one_pos_delay_milliseconds));
     --position_;
 }
 
@@ -66,22 +72,16 @@ void FileTapeDevice::moveForward()
         return;
     if (position_ >= tapeArray_.size() - 1)
     {
-        if (!isFixedSize_) {
-            tapeArray_.push_back(std::nullopt); // Expand the tape with an uninitialized value
-        } else {
-            throw EndReachedException("End of tape reached.");
-        }
+        throw EndReachedException("End of tape reached.");
     }
+    std::cout << "File: " << characts_.tape_file << ", Operation: moveForward, Position: " << position_ << ", Delay: " << characts_.move_one_pos_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.move_one_pos_delay_milliseconds));
     ++position_;
 }
 
 bool FileTapeDevice::canMoveForward() const
 {
-    if (isFixedSize_) {
-        return tapeArray_.size() != 0 and position_ < tapeArray_.size() - 1;
-    } else {
-        return true; // Can always move forward if the tape is not fixed size, as it can expand
-    }
+    return tapeArray_.size() != 0 and position_ < tapeArray_.size() - 1;
 }
 bool FileTapeDevice::canMoveBack() const
 {
@@ -92,35 +92,27 @@ void FileTapeDevice::moveToBegin()
 {
     if (tapeArray_.size() == 0)
         return;
-    while (position_ > 0) {
-        moveBack();
-    }
+    std::cout << "File: " << characts_.tape_file << ", Operation: moveToBegin, Position: " << position_ << ", Delay: " << characts_.move_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.move_delay_milliseconds));
+    position_ = 0;
 }
 
 void FileTapeDevice::moveToEnd()
 {
     if (tapeArray_.size() == 0)
         return;
-    if (!isFixedSize_) {
-        while (position_ < tapeArray_.size() - 1) {
-            moveForward();
-        }
-    } else {
-        throw std::runtime_error("moveToEnd called with isFixedSize_ set to false");
-    }
+    std::cout << "File: " << characts_.tape_file << ", Operation: moveToEnd, Position: " << position_ << ", Delay: " << characts_.move_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.move_delay_milliseconds));
+    position_ = tapeArray_.size() - 1;
 }
 
 void FileTapeDevice::moveToIndex(unsigned long index)
 {
     if (index >= tapeArray_.size()) {
-        if (isFixedSize_) {
-            throw EndReachedException("Index out of bounds.");
-        } else {
-            while (tapeArray_.size() <= index) {
-                tapeArray_.push_back(std::nullopt); // Expand the tape with an uninitialized value
-            }
-        }
+        throw EndReachedException("Index out of bounds.");
     }
+    std::cout << "File: " << characts_.tape_file << ", Operation: moveToIndex, Position: " << position_ << ", Delay: " << characts_.move_delay_milliseconds << "ms\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(characts_.move_delay_milliseconds));
     position_ = index;
 }
 
@@ -152,12 +144,6 @@ bool FileTapeDevice::empty()
     return tapeArray_.empty() || std::all_of(tapeArray_.begin(), tapeArray_.end(), [](const std::optional<unsigned>& elem) { return !elem.has_value(); });
 }
 
-void FileTapeDevice::fixSize()
-{
-    assert(!isFixedSize_);
-    isFixedSize_ = true;
-}
-
 std::vector<unsigned> FileTapeDevice::toVector()
 {
     std::vector<unsigned> result;
@@ -174,12 +160,13 @@ std::vector<unsigned> FileTapeDevice::toVector()
 
 void FileTapeDevice::write(std::vector<unsigned> arr)
 {
-    for (unsigned value : arr) {
-        write(value);
+    for (auto it = arr.begin(); it != arr.end(); ++it) {
+        write(*it);
         if (canMoveForward()) {
             moveForward();
         } else {
-            throw std::out_of_range("Reached end of tape while writing.");
+            if (std::next(it) != arr.end())
+                throw std::out_of_range("Reached end of tape while writing.");
         }
     }
 }

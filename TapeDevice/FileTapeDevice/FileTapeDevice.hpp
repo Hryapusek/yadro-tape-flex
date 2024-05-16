@@ -12,10 +12,10 @@
 struct TapeDeviceCharacteristics
 {
     std::filesystem::path tape_file;
-    double read_delay;
-    double write_delay;
-    double move_delay;
-    double move_one_pos_delay;
+    int read_delay_milliseconds;
+    int write_delay_milliseconds;
+    int move_delay_milliseconds;
+    int move_one_pos_delay_milliseconds;
 };
 
 class FileTapeDevice: public ITapeDevice {
@@ -111,11 +111,6 @@ public:
     virtual bool empty() override;
 
     /**
-     * @brief Fixes the size of the tape, preventing further expansion.
-     */
-    virtual void fixSize() override;
-
-    /**
      * @brief Converts the tape contents to a vector.
      * @return A vector containing the tape contents.
      */
@@ -138,7 +133,6 @@ public:
 private:
     TapeDeviceCharacteristics characts_;
     std::vector<std::optional<unsigned>> tapeArray_;
-    bool isFixedSize_ = false;
     std::vector<unsigned>::size_type position_ = 0;
     std::ofstream outputFile_;
 };
