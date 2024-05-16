@@ -23,13 +23,13 @@ std::shared_ptr<ITapeDevice> createTempTape(unsigned long tapeSize, const InputC
 
 	TapeDeviceCharacteristics tempTapeCharacteristics{
 		.tape_file = tempFilePath,
-		.read_delay = characts.read_delay,
-		.write_delay = characts.write_delay,
-		.move_delay = characts.move_delay,
-		.move_one_pos_delay = characts.move_one_pos_delay,
+		.read_delay_milliseconds = characts.read_delay_milliseconds,
+		.write_delay_milliseconds = characts.write_delay_milliseconds,
+		.move_delay_milliseconds = characts.move_delay_milliseconds,
+		.move_one_pos_delay_milliseconds = characts.move_one_pos_delay_milliseconds,
 	};
 
-	return std::static_pointer_cast<ITapeDevice>(std::make_shared<FileTapeDevice>(std::move(tempTapeCharacteristics)));
+	return std::static_pointer_cast<ITapeDevice>(std::make_shared<FileTapeDevice>(std::move(tempTapeCharacteristics), tapeSize));
 }
 
 void saveNumbersInTempTapes(ITapeDevice *inputTape, std::vector<std::shared_ptr<ITapeDevice> > &tempTapes,
@@ -49,6 +49,7 @@ void saveNumbersInTempTapes(ITapeDevice *inputTape, std::vector<std::shared_ptr<
 			{
 				tempTapes.push_back(createTempTape(TapeSorterUtils::calculateMaxArrayLength(characts), characts));
 			}
+			inputTape->moveForward();
 		}
 	}
 	catch(const EndReachedException& e)
@@ -68,7 +69,7 @@ void sortTempTapesAndWriteToOutput(std::vector<std::shared_ptr<ITapeDevice> > &t
 		try
 		{
 			auto numbers = tapeDevice->toVector();
-			std::sort(numbers.begin(), numbers.end());
+			std::ranges::sort(numbers);
 			outputTape->write(numbers);
 		}
 		catch(const ReadFailedException& e)
@@ -96,7 +97,6 @@ void SortNotEnoughMemoryStrategy::sort(ITapeDevice * inputTape, ITapeDevice * ou
 		return;
 	}
 	sortTempTapesAndWriteToOutput(tempTapes, outputTape);
-	outputTape->fixSize();
 	TapeSorterUtils::sortTape(outputTape);
 	std::cout << "Sorting finished, sorted tape will be written to the output file soon...";
 }
