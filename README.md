@@ -3,7 +3,7 @@
 On the start program tries to read in `config.txt` file in the current directory.
 
 To use this program, follow these steps:
-1. Configure the input and output file paths in the `config.txt` file.
+1. Configure the input and output file paths in the `config.txt` file, also better change delays here.
 2. Run the program and observe the sorting process.
 3. Check the output file to view the sorted tape contents.
 
