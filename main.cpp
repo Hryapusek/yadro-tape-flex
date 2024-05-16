@@ -6,7 +6,7 @@
 #include <memory>
 
 
-int main(int argc, char const *argv[])
+int main()
 {
     namespace fs = std::filesystem;
     fs::path configFile("config.txt");
@@ -18,18 +18,18 @@ int main(int argc, char const *argv[])
     
     TapeDeviceCharacteristics inputTapeCharacteristics{
         .tape_file = inputTapeFile,
-        .read_delay = characteristics.read_delay,
-        .write_delay = characteristics.write_delay,
-        .move_delay = characteristics.move_delay,
-        .move_one_pos_delay = characteristics.move_one_pos_delay,
+        .read_delay_milliseconds = characteristics.read_delay_milliseconds,
+        .write_delay_milliseconds = characteristics.write_delay_milliseconds,
+        .move_delay_milliseconds = characteristics.move_delay_milliseconds,
+        .move_one_pos_delay_milliseconds = characteristics.move_one_pos_delay_milliseconds,
     };
 
     TapeDeviceCharacteristics outputTapeCharacteristics{
         .tape_file = outputTapeFile,
-        .read_delay = characteristics.read_delay,
-        .write_delay = characteristics.write_delay,
-        .move_delay = characteristics.move_delay,
-        .move_one_pos_delay = characteristics.move_one_pos_delay,
+        .read_delay_milliseconds = characteristics.read_delay_milliseconds,
+        .write_delay_milliseconds = characteristics.write_delay_milliseconds,
+        .move_delay_milliseconds = characteristics.move_delay_milliseconds,
+        .move_one_pos_delay_milliseconds = characteristics.move_one_pos_delay_milliseconds,
     };
 
     auto inputTape = std::make_unique<FileTapeDevice>(inputTapeCharacteristics);

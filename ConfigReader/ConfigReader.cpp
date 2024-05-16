@@ -45,7 +45,7 @@ InputCharacteristics ConfigReader::readFromFile(std::filesystem::path file)
 	if (not inputFile.is_open())
 		throw FileNotFoundException("File with name " + file.string() + " not found");
 
-	std::optional<double> read_delay, write_delay, move_delay, move_one_pos_delay;
+	std::optional<int> read_delay_milliseconds, write_delay_milliseconds, move_delay_milliseconds, move_one_pos_delay_milliseconds;
 	std::optional<unsigned long> memory_bytes, reasonable_number_of_temp_tapes;
 	std::optional<std::string> input_file, output_file;
 
@@ -68,14 +68,14 @@ InputCharacteristics ConfigReader::readFromFile(std::filesystem::path file)
 		std::string paramValueStr = line.substr(colonPos + 1);
 
 
-		if (paramName == "read_delay")
-			read_delay = std::stod(paramValueStr);
-		else if (paramName == "write_delay")
-			write_delay = std::stod(paramValueStr);
-		else if (paramName == "move_delay")
-			move_delay = std::stod(paramValueStr);
-		else if (paramName == "move_one_pos_delay")
-			move_one_pos_delay = std::stod(paramValueStr);
+		if (paramName == "read_delay_milliseconds")
+			read_delay_milliseconds = std::stoi(paramValueStr);
+		else if (paramName == "write_delay_milliseconds")
+			write_delay_milliseconds = std::stoi(paramValueStr);
+		else if (paramName == "move_delay_milliseconds")
+			move_delay_milliseconds = std::stoi(paramValueStr);
+		else if (paramName == "move_one_pos_delay_milliseconds")
+			move_one_pos_delay_milliseconds = std::stoi(paramValueStr);
 		else if (paramName == "memory_bytes")
 			memory_bytes = std::stoul(paramValueStr);
 		else if (paramName == "reasonable_number_of_temp_tapes")
@@ -88,12 +88,12 @@ InputCharacteristics ConfigReader::readFromFile(std::filesystem::path file)
 			std::cout << "Unused parameter " << paramName << " found in config file\n";
 	}
 
-	checkParameters(read_delay, write_delay, move_delay, move_one_pos_delay, memory_bytes, input_file, output_file, reasonable_number_of_temp_tapes);
+	checkParameters(read_delay_milliseconds, write_delay_milliseconds, move_delay_milliseconds, move_one_pos_delay_milliseconds, memory_bytes, input_file, output_file, reasonable_number_of_temp_tapes);
 	
-	inputCharacteristics.read_delay = *read_delay;
-	inputCharacteristics.write_delay = *write_delay;
-	inputCharacteristics.move_delay = *move_delay;
-	inputCharacteristics.move_one_pos_delay = *move_one_pos_delay;
+	inputCharacteristics.read_delay_milliseconds = *read_delay_milliseconds;
+	inputCharacteristics.write_delay_milliseconds = *write_delay_milliseconds;
+	inputCharacteristics.move_delay_milliseconds = *move_delay_milliseconds;
+	inputCharacteristics.move_one_pos_delay_milliseconds = *move_one_pos_delay_milliseconds;
 	inputCharacteristics.memory_bytes = *memory_bytes;
 	inputCharacteristics.input_file = *input_file;
 	inputCharacteristics.output_file = *output_file;
@@ -103,30 +103,30 @@ InputCharacteristics ConfigReader::readFromFile(std::filesystem::path file)
 	return inputCharacteristics;
 }
 
-void ConfigReader::checkParameters(std::optional<double> &read_delay, std::optional<double> &write_delay,
-	                                          std::optional<double> &move_delay, std::optional<double> &move_one_pos_delay,
-	                                          std::optional<unsigned long> &memory_bytes, std::optional<std::string> &input_file,
-	                                          std::optional<std::string> &output_file, std::optional<unsigned long> &reasonable_number_of_temp_tapes)
+void ConfigReader::checkParameters(std::optional<int> &read_delay_milliseconds, std::optional<int> &write_delay_milliseconds,
+									std::optional<int> &move_delay_milliseconds, std::optional<int> &move_one_pos_delay_milliseconds,
+									std::optional<unsigned long> &memory_bytes, std::optional<std::string> &input_file,
+									std::optional<std::string> &output_file, std::optional<unsigned long> &reasonable_number_of_temp_tapes)
 {
-	if (not read_delay)
-		throw FieldNotFoundException("read_delay not found in config");
-	if (*read_delay <= 0)
-		throw BadFieldException("read_delay less than or zero");
+	if (not read_delay_milliseconds)
+		throw FieldNotFoundException("read_delay_milliseconds not found in config");
+	if (*read_delay_milliseconds <= 0)
+		throw BadFieldException("read_delay_milliseconds less than or zero");
 
-	if (not write_delay)
-		throw FieldNotFoundException("write_delay not found in config");
-	if (*write_delay <= 0)
-		throw BadFieldException("write_delay less than or zero");
+	if (not write_delay_milliseconds)
+		throw FieldNotFoundException("write_delay_milliseconds not found in config");
+	if (*write_delay_milliseconds <= 0)
+		throw BadFieldException("write_delay_milliseconds less than or zero");
 
-	if (not move_delay)
-		throw FieldNotFoundException("move_delay not found in config");
-	if (*move_delay <= 0)
-		throw BadFieldException("move_delay less than or zero");
+	if (not move_delay_milliseconds)
+		throw FieldNotFoundException("move_delay_milliseconds not found in config");
+	if (*move_delay_milliseconds <= 0)
+		throw BadFieldException("move_delay_milliseconds less than or zero");
 
-	if (not move_one_pos_delay)
-		throw FieldNotFoundException("move_one_pos_delay not found in config");
-	if (*move_one_pos_delay <= 0)
-		throw BadFieldException("move_one_pos_delay less than or zero");
+	if (not move_one_pos_delay_milliseconds)
+		throw FieldNotFoundException("move_one_pos_delay_milliseconds not found in config");
+	if (*move_one_pos_delay_milliseconds <= 0)
+		throw BadFieldException("move_one_pos_delay_milliseconds less than or zero");
 
 	if (not memory_bytes)
 		throw FieldNotFoundException("memory_bytes not found in config");
@@ -154,10 +154,10 @@ void ConfigReader::checkParameters(std::optional<double> &read_delay, std::optio
 
 std::ostream &operator<<(std::ostream &out, const InputCharacteristics characts)
 {
-	out << "read_delay: " << characts.read_delay << '\n';
-	out << "write_delay: " << characts.write_delay << '\n';
-	out << "move_delay: " << characts.move_delay << '\n';
-	out << "move_one_pos_delay: " << characts.move_one_pos_delay << '\n';
+	out << "read_delay_milliseconds: " << characts.read_delay_milliseconds << '\n';
+	out << "write_delay_milliseconds: " << characts.write_delay_milliseconds << '\n';
+	out << "move_delay_milliseconds: " << characts.move_delay_milliseconds << '\n';
+	out << "move_one_pos_delay_milliseconds: " << characts.move_one_pos_delay_milliseconds << '\n';
 	out << "memory_bytes: " << characts.memory_bytes << '\n';
 	out << "input_file: " << characts.input_file << '\n';
 	out << "output_file: " << characts.output_file << '\n';

@@ -8,10 +8,10 @@
 
 struct InputCharacteristics
 {
-	double read_delay;
-	double write_delay;
-	double move_delay;
-	double move_one_pos_delay;
+	int read_delay_milliseconds;
+	int write_delay_milliseconds;
+	int move_delay_milliseconds;
+	int move_one_pos_delay_milliseconds;
 	unsigned long memory_bytes;
 	unsigned long reasonable_number_of_temp_tapes;
 	std::string input_file;
@@ -33,10 +33,10 @@ public:
 	static InputCharacteristics readFromFile(std::filesystem::path file);
 
 private:
-	static void checkParameters(std::optional<double> &read_delay, std::optional<double> &write_delay,
-								std::optional<double> &move_delay, std::optional<double> &move_one_pos_delay,
-								std::optional<unsigned long> &memory_bytes, std::optional<std::string> &input_file,
-								std::optional<std::string> &output_file, std::optional<unsigned long> &reasonable_number_of_temp_tapes);
+	static void checkParameters(std::optional<int> &read_delay_milliseconds, std::optional<int> &write_delay_milliseconds,
+									std::optional<int> &move_delay_milliseconds, std::optional<int> &move_one_pos_delay_milliseconds,
+									std::optional<unsigned long> &memory_bytes, std::optional<std::string> &input_file,
+									std::optional<std::string> &output_file, std::optional<unsigned long> &reasonable_number_of_temp_tapes);
 };
 
 #endif
